@@ -1,5 +1,7 @@
 module DLProteinFormats
 
-# Write your package code here.
+using ProteinChains, StatsBase, Random
+
+include("FlatFrames.jl")
 
 end
