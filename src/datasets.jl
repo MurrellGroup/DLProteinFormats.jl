@@ -30,13 +30,13 @@ export PDBStore, PDBStoreSubset, PDBSimpleFlat, PDBSimpleFlatSubset
 export SwissProtStore, SwissProtStoreSubset, SwissProtSimpleFlat, SwissProtSimpleFlatSubset
 
 const PDBStore = PSSDataset("MurrellLab/ProteinChains", "pdb.pss")
-const PDBStoreSubset = PSSDataset("MurrellLab/ProteinChains", "pdb-500.pss")
+const PDBStore500 = PSSDataset("MurrellLab/ProteinChains", "pdb-500.pss")
 const PDBSimpleFlat = SerializedDataset("MurrellLab/ProteinChains", "pdb-simple-flat.jls")
-const PDBSimpleFlatSubset = SerializedDataset("MurrellLab/ProteinChains", "pdb-simple-flat-500.jls")
+const PDBSimpleFlat500 = SerializedDataset("MurrellLab/ProteinChains", "pdb-simple-flat-500.jls")
 
-const SwissProtStore = PSSDataset("MurrellLab/ProteinChains", "swissprot-split.pss")
-const SwissProtStoreSubset = PSSDataset("MurrellLab/ProteinChains", "swissprot-split-500.pss")
-const SwissProtSimpleFlat = SerializedDataset("MurrellLab/ProteinChains", "swissprot-simple-flat.jls")
-const SwissProtSimpleFlatSubset = SerializedDataset("MurrellLab/ProteinChains", "swissprot-simple-flat-500.jls")
+const SwissProtSplitStore = PSSDataset("MurrellLab/ProteinChains", "swissprot-split.pss")
+const SwissProtSplitStore500 = PSSDataset("MurrellLab/ProteinChains", "swissprot-split-500.pss")
+const SwissProtSplitSimpleFlat = SerializedDataset("MurrellLab/ProteinChains", "swissprot-split-simple-flat.jls")
+const SwissProtSplitSimpleFlat500 = SerializedDataset("MurrellLab/ProteinChains", "swissprot-split-simple-flat-500.jls")
 
 remove_cache(dataset::AbstractProteinDataset) = HuggingFaceApi.remove_cache(dataset.hfurl)
