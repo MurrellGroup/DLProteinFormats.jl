@@ -86,4 +86,19 @@ function sample_batched_inds(flatrecs; l2b = length2batch(1000, 1.9))
     return shuffle(batch_inds)
 end
 
-#Add function to convert a flattened protein into a ProteinChains struct for plotting etc
+function unflatten(locs::AbstractArray{T,3}, rots::AbstractArray{T,3}, seqints::AbstractVector, chainids, resnums) where T
+    seqstrs = ints_to_aa(seqints)
+    return [ProteinChain(string(i),
+                get_atoms(Frames(rots[:,:,chainids .== i], reshape(locs,3,:)[:,chainids .== i] .* unit_scaling)(ProteinChains.STANDARD_RESIDUE)),
+                seqstrs[findall(chainids .== i)], resnums[findall(chainids .== i)]) 
+            for i in unique(chainids)]
+end
+
+function unflatten(locs::AbstractArray{T,3}, rots::AbstractArray{T,3}, seqhots::AbstractArray, chainids, resnums) where T
+    seqints = [argmax(x[:]) for x in eachslice(seqhots, dims = 2)]
+    return unflatten(locs, rots, seqints, chainids, resnums)
+end
+
+function unflatten(locs::AbstractArray{T,4}, rots::AbstractArray{T,4}, seq, chainids, resnums) where T
+    return [unflatten(locs[:,:,:,i], rots[:,:,:,i], selectdim(seq, ndims(seq), i), chainids[:,i], resnums[:,i]) for i in 1:size(locs, 4)]
+end
