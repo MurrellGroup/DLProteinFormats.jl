@@ -39,5 +39,5 @@ const SwissProtSplitStore500 = PSSDataset("MurrellLab/ProteinChains", "swissprot
 const SwissProtSplitSimpleFlat = SerializedDataset("MurrellLab/ProteinChains", "swissprot-split-simple-flat.jls")
 const SwissProtSplitSimpleFlat500 = SerializedDataset("MurrellLab/ProteinChains", "swissprot-split-simple-flat-500.jls")
 
-remove_cache(dataset::AbstractProteinDataset) = HuggingFaceApi.remove_cache(dataset.hfurl)
+remove_cache(dataset::AbstractProteinDataset) = HuggingFaceApi.remove_cache(dataset.hfurl; now=true)
 remove_cache() = HuggingFaceApi.remove_cache("MurrellLab/ProteinChains")
