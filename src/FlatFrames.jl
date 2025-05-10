@@ -1,11 +1,3 @@
-const unit_scaling = 10
-const AAs = collect("ACDEFGHIKLMNPQRSTVWY")
-const AA2ind = Dict(zip(AAs,1:length(AAs)))
-aa_to_int(aa::Char) = get(AA2ind, aa, 21)
-int_to_aa(i::Int) = i == 21 ? 'X' : AAs[i]
-aa_to_ints(aa::AbstractString) = [aa_to_int(a) for a in aa]
-ints_to_aa(ints::AbstractVector) = join(int_to_aa.(ints))
-
 """
     flatten(rec::ProteinStructure; T = Float32)
 
@@ -52,53 +44,4 @@ function batch_flatrecs(recs::AbstractVector)
         padmask[1:flat.len,i] .= 1
     end
     return (;locs, rots, aas, resinds, chainids, padmask)
-end
-
-one_ind_per_cluster(clusters) = [rand(findall(clusters .== c)) for c in unique(clusters)]
-length2batch(length_max, fac) = L -> floor(Int, length_max^fac/L^fac)
-
-"""
-    sample_batched_inds(flatrecs; l2b = length2batch(1000, 1.9))
-
-Takes a vector of (flattened) protein structures, and returns a vector of indices into the original array, with each batch containing a random sample of one protein from each cluster.
-"""
-function sample_batched_inds(flatrecs; l2b = length2batch(1000, 1.9))
-    sampled_inds = filter(ind -> l2b(flatrecs.len[ind]) > 0, one_ind_per_cluster([r.cluster for r in flatrecs]))
-    indices_lengths_jitter = [(ind, flatrecs.len[ind], flatrecs.len[ind] + 2randn()) for ind in sampled_inds]
-    sort!(indices_lengths_jitter, by = x -> x[3])
-    batch_inds = Vector{Int}[]
-    current_batch = Int[]
-    current_max_len = 0
-    for (sampled_idx, original_len, _) in indices_lengths_jitter
-        potential_max_len = max(current_max_len, original_len)
-        if isempty(current_batch) || (length(current_batch) + 1 <= l2b(potential_max_len))
-            push!(current_batch, sampled_idx)
-            current_max_len = potential_max_len
-        else
-            push!(batch_inds, current_batch)
-            current_batch = [sampled_idx]
-            current_max_len = original_len
-        end
-    end
-    if !isempty(current_batch)
-        push!(batch_inds, current_batch)
-    end
-    return shuffle(batch_inds)
-end
-
-function unflatten(locs::AbstractArray{T,3}, rots::AbstractArray{T,3}, seqints::AbstractVector, chainids, resnums) where T
-    seqstrs = ints_to_aa(seqints)
-    return [ProteinChain(string(i),
-                get_atoms(Frames(rots[:,:,chainids .== i], reshape(locs,3,:)[:,chainids .== i] .* unit_scaling)(ProteinChains.STANDARD_RESIDUE)),
-                seqstrs[findall(chainids .== i)], resnums[findall(chainids .== i)]) 
-            for i in unique(chainids)]
-end
-
-function unflatten(locs::AbstractArray{T,3}, rots::AbstractArray{T,3}, seqhots::AbstractArray, chainids, resnums) where T
-    seqints = [argmax(x[:]) for x in eachslice(seqhots, dims = 2)]
-    return unflatten(locs, rots, seqints, chainids, resnums)
-end
-
-function unflatten(locs::AbstractArray{T,4}, rots::AbstractArray{T,4}, seq, chainids, resnums) where T
-    return [unflatten(locs[:,:,:,i], rots[:,:,:,i], selectdim(seq, ndims(seq), i), chainids[:,i], resnums[:,i]) for i in 1:size(locs, 4)]
 end
