@@ -117,7 +117,7 @@ function feature_and_residue_dropout(flatrec; block_drop_p = 0.2, block_size_dis
         end
         chain_feats[drop_rows, flatrec.chainids .== c] .= 0
     end
-    return (;len = sum(drop_mask), cluster = flatrec.cluster, locs = flatrec.locs[:,:,drop_mask], rots = flatrec.rots[:,:,drop_mask], AAs = flatrec.AAs[drop_mask],
+    return (;record_type = AnnotatedV1(), len = sum(drop_mask), cluster = flatrec.cluster, locs = flatrec.locs[:,:,drop_mask], rots = flatrec.rots[:,:,drop_mask], AAs = flatrec.AAs[drop_mask],
     resinds = flatrec.resinds[drop_mask], chainids = flatrec.chainids[drop_mask], chainfeats = chain_feats[:,drop_mask])
 end
 
