@@ -77,8 +77,6 @@ function batch_flatrecs(recs::AbstractVector{<:AnnotatedV1NT})
     AAs = zeros(Int, maxlen, b) .+ 21
     resinds = zeros(Int, maxlen, b)
     chainids = zeros(Int, maxlen, b)
-    aa_cmask = ones(Bool, maxlen, b) #<- Poor sep of concerns
-    res_cmask = ones(Bool, maxlen, b) #<- Poor sep of concerns
     padmask = zeros(Bool, maxlen, b) #<- If mask bug, come back to this and make it an Int again. But then you'll have to change this in the batched mask sampler: inds = b.padmask[:,i]
     chainfeats = similar(recs[1].chainfeats, size(recs[1].chainfeats,1), maxlen, b) .= 0
     for i in 1:b
@@ -90,14 +88,8 @@ function batch_flatrecs(recs::AbstractVector{<:AnnotatedV1NT})
         chainids[1:flat.len,i] .= flat.chainids
         chainfeats[:,1:flat.len,i] .= flat.chainfeats
         padmask[1:flat.len,i] .= 1
-        if haskey(flat, :aa_cmask)
-            aa_cmask[1:flat.len,i] .= flat.aa_cmask
-        end
-        if haskey(flat, :res_cmask)
-            res_cmask[1:flat.len,i] .= flat.res_cmask
-        end
     end
-    return (;record_type = BatchedAnnotatedV1(), locs, rots, AAs, resinds, chainids, padmask, chainfeats, aa_cmask, res_cmask)
+    return (;record_type = BatchedAnnotatedV1(), locs, rots, AAs, resinds, chainids, padmask, chainfeats)
 end
 
 
