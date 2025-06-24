@@ -86,6 +86,26 @@ function sample_batched_inds(flatrecs; l2b = length2batch(1000, 1.9))
     return shuffle(batch_inds)
 end
 
+"""
+    unflatten(locs, rots, seqints, chainids, resnums)
+    unflatten(locs, rots, seqhots, chainids, resnums)  
+    unflatten(locs, rots, seq, chainids, resnums)
+
+Converts flattened protein structure data back into ProteinChain objects.
+
+# Arguments
+- `locs`: Array of translations/locations (3×1×L or 3×1×L×B for batched)
+- `rots`: Array of rotations (3×3×L or 3×3×L×B for batched) 
+- `seqints`/`seqhots`/`seq`: Sequence data as integers, one-hot encoding, or generic sequence
+- `chainids`: Chain identifiers for each residue
+- `resnums`: Residue numbers for each position
+
+# Returns
+- Vector of `ProteinChain` objects (or vector of vectors for batched input)
+
+The function reconstructs protein chains from flattened representations, applying unit scaling
+to locations and converting sequence integers back to amino acid strings.
+"""
 function unflatten(locs::AbstractArray{T,3}, rots::AbstractArray{T,3}, seqints::AbstractVector, chainids, resnums) where T
     seqstrs = ints_to_aa(seqints)
     return [ProteinChain(string(i),
