@@ -28,6 +28,7 @@ load(dataset::SerializedDataset) = deserialize(cached_download(dataset.hfurl))
 
 export PDBStore, PDBStore500, PDBSimpleFlat, PDBSimpleFlat500
 export SwissProtSplitStore, SwissProtSplitStore500, SwissProtSplitSimpleFlat, SwissProtSplitSimpleFlat500
+export QM9Crude1000
 
 const PDBStore = PSSDataset("MurrellLab/ProteinChains", "pdb.pss")
 const PDBStore500 = PSSDataset("MurrellLab/ProteinChains", "pdb-500.pss")
@@ -38,6 +39,8 @@ const SwissProtSplitStore = PSSDataset("MurrellLab/ProteinChains", "swissprot-sp
 const SwissProtSplitStore500 = PSSDataset("MurrellLab/ProteinChains", "swissprot-split-500.pss")
 const SwissProtSplitSimpleFlat = SerializedDataset("MurrellLab/ProteinChains", "swissprot-split-simple-flat.jls")
 const SwissProtSplitSimpleFlat500 = SerializedDataset("MurrellLab/ProteinChains", "swissprot-split-simple-flat-500.jls")
+
+const QM9Crude1000 = SerializedDataset("MurrellLab/ProteinChains", "qm9-crude-1000.jls")
 
 remove_cache(dataset::AbstractProteinDataset) = HuggingFaceApi.remove_cache(dataset.hfurl; now=true)
 remove_cache() = HuggingFaceApi.remove_cache("MurrellLab/ProteinChains")
