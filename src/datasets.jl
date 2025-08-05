@@ -27,6 +27,7 @@ load(dataset::SerializedDataset) = deserialize(cached_download(dataset.hfurl))
 
 
 export PDBStore, PDBStore500, PDBSimpleFlat, PDBSimpleFlat500
+export PDBFlatom169K
 export SwissProtSplitStore, SwissProtSplitStore500, SwissProtSplitSimpleFlat, SwissProtSplitSimpleFlat500
 export QM9Crude1000
 
@@ -34,6 +35,8 @@ const PDBStore = PSSDataset("MurrellLab/ProteinChains", "pdb.pss")
 const PDBStore500 = PSSDataset("MurrellLab/ProteinChains", "pdb-500.pss")
 const PDBSimpleFlat = SerializedDataset("MurrellLab/ProteinChains", "pdb-simple-flat.jls")
 const PDBSimpleFlat500 = SerializedDataset("MurrellLab/ProteinChains", "pdb-simple-flat-500.jls")
+
+const PDBFlatom169K = SerializedDataset("MurrellLab/ProteinChains", "flatom-169k.jls")
 
 const SwissProtSplitStore = PSSDataset("MurrellLab/ProteinChains", "swissprot-split.pss")
 const SwissProtSplitStore500 = PSSDataset("MurrellLab/ProteinChains", "swissprot-split-500.pss")
