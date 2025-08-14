@@ -2,6 +2,8 @@ module DLProteinFormats
 
 using ProteinChains, StatsBase, Random
 
+include("Flatom/Flatom.jl")
+
 include("FlatFrames.jl")
 export flatten, unflatten
 
