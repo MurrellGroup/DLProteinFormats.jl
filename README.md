@@ -9,8 +9,8 @@
 
 ```julia
 using Pkg
-Pkg.Registry.add("https://github.com/MurrellGroup/MurrellGroupRegistry")
-Pkg.add("DLProteinFormats")
+pkg"registry add https://github.com/MurrellGroup/MurrellGroupRegistry"
+pkg"add DLProteinFormats"
 ```
 
 ## Quickstart
