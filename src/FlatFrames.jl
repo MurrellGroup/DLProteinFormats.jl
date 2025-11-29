@@ -86,7 +86,7 @@ function sample_batched_inds(lens, clusters; l2b = length2batch(1000, 1.9))
     return shuffle(batch_inds)
 end
 
-sample_batched_inds(flatrecs::MergedVector; l2b = length2batch(1000, 1.9)) = sample_batched_inds(flatrecs.len, flatrecs.cluster, l2b = l2b)
+sample_batched_inds(flatrecs::MergedArrays.MergedVector; l2b = length2batch(1000, 1.9)) = sample_batched_inds(flatrecs.len, flatrecs.cluster, l2b = l2b)
 
 """
     unflatten(locs, rots, seqints, chainids, resnums)
