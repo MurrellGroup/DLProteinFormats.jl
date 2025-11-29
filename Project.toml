@@ -1,7 +1,7 @@
 name = "DLProteinFormats"
 uuid = "df93d313-1126-4eb6-ac29-b325d5898587"
 authors = ["murrellb <murrellb@gmail.com> and contributors"]
-version = "0.1.9"
+version = "0.1.10"
 
 [deps]
 BioStructures = "de9282ab-8554-53be-b2d6-f6c222edabfc"
