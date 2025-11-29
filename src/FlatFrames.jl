@@ -62,9 +62,9 @@ length2batch(length_max, fac) = L -> floor(Int, length_max^fac/L^fac)
 
 Takes a vector of (flattened) protein structures, and returns a vector of indices into the original array, with each batch containing a random sample of one protein from each cluster.
 """
-function sample_batched_inds(flatrecs; l2b = length2batch(1000, 1.9))
-    sampled_inds = filter(ind -> l2b(flatrecs.len[ind]) > 0, one_ind_per_cluster([r.cluster for r in flatrecs]))
-    indices_lengths_jitter = [(ind, flatrecs.len[ind], flatrecs.len[ind] + 2randn()) for ind in sampled_inds]
+function sample_batched_inds(lens, clusters; l2b = length2batch(1000, 1.9))
+    sampled_inds = filter(ind -> l2b(lens[ind]) > 0, one_ind_per_cluster(clusters))
+    indices_lengths_jitter = [(ind, lens[ind], lens[ind] + 2randn()) for ind in sampled_inds]
     sort!(indices_lengths_jitter, by = x -> x[3])
     batch_inds = Vector{Int}[]
     current_batch = Int[]
@@ -85,6 +85,8 @@ function sample_batched_inds(flatrecs; l2b = length2batch(1000, 1.9))
     end
     return shuffle(batch_inds)
 end
+
+sample_batched_inds(flatrecs::MergedArrays.MergedVector; l2b = length2batch(1000, 1.9)) = sample_batched_inds(flatrecs.len, flatrecs.cluster, l2b = l2b)
 
 """
     unflatten(locs, rots, seqints, chainids, resnums)
