@@ -1,6 +1,6 @@
 module DLProteinFormats
 
-using ProteinChains, StatsBase, Random
+using ProteinChains, StatsBase, Random, MergedArrays
 
 include("Flatom/Flatom.jl")
 
