@@ -45,7 +45,7 @@ end
 
 JLD2Dataset(args...) = JLD2Dataset(HuggingFaceURL(args...; repo_type="datasets"))
 
-load(dataset::JLD2Dataset) = JLD2.load(cached_download(dataset.hfurl))
+load(dataset::JLD2Dataset) = JLD2.load(cached_download(dataset.hfurl))["data"]
 
 
 export PDBStore, PDBStore500, PDBSimpleFlat, PDBSimpleFlat500, PDBSimpleFlatV2, PDBSimpleFlatV2_500
@@ -58,8 +58,8 @@ const PDBStore = PSSDataset("MurrellLab/ProteinChains", "pdb.pss")
 const PDBStore500 = PSSDataset("MurrellLab/ProteinChains", "pdb-500.pss")
 const PDBSimpleFlat = SerializedDataset("MurrellLab/ProteinChains", "pdb-simple-flat.jls")
 const PDBSimpleFlat500 = SerializedDataset("MurrellLab/ProteinChains", "pdb-simple-flat-500.jls")
-const PDBSimpleFlatV2 = SerializedDataset("MurrellLab/ProteinChains", "flat-v2.jls")
-const PDBSimpleFlatV2_500 = SerializedDataset("MurrellLab/ProteinChains", "flat-v2-500.jls")
+const PDBSimpleFlatV2 = JLD2Dataset("MurrellLab/ProteinChains", "flat-v2.jld2")
+const PDBSimpleFlatV2_500 = JLD2Dataset("MurrellLab/ProteinChains", "flat-v2-500.jld2")
 
 const PDBClusters = SerializedDataset("MurrellLab/ProteinChains", "pdb-clusters.jls")
 const PDBMethods = CSVDataset("MurrellLab/ProteinChains", "pdb-methods.csv")
