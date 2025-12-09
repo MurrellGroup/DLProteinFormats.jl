@@ -9,6 +9,8 @@ export flatten, unflatten
 
 include("datasets.jl")
 
+include("shared.jl")
+
 
 import ProteinChains: writepdb, writecif, pdbentry, @pdb_str
 export writepdb, writecif, pdbentry, @pdb_str
