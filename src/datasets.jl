@@ -37,8 +37,19 @@ CSVDataset(args...) = CSVDataset(HuggingFaceURL(args...; repo_type="datasets"))
 load(dataset::CSVDataset, sink=DataFrame) = CSV.read(cached_download(dataset.hfurl), sink)
 
 
+using JLD2
+
+struct JLD2Dataset <: AbstractProteinDataset
+    hfurl::HuggingFaceURL
+end
+
+JLD2Dataset(args...) = JLD2Dataset(HuggingFaceURL(args...; repo_type="datasets"))
+
+load(dataset::JLD2Dataset) = JLD2.load(cached_download(dataset.hfurl))
+
+
 export PDBStore, PDBStore500, PDBSimpleFlat, PDBSimpleFlat500, PDBSimpleFlatV2, PDBSimpleFlatV2_500
-export PDBClusters, PDBTable
+export PDBClusters, PDBMethods, PDBTable
 export PDBFlatom169K
 export SwissProtSplitStore, SwissProtSplitStore500, SwissProtSplitSimpleFlat, SwissProtSplitSimpleFlat500
 export QM9Crude1000
@@ -51,6 +62,7 @@ const PDBSimpleFlatV2 = SerializedDataset("MurrellLab/ProteinChains", "flat-v2.j
 const PDBSimpleFlatV2_500 = SerializedDataset("MurrellLab/ProteinChains", "flat-v2-500.jls")
 
 const PDBClusters = SerializedDataset("MurrellLab/ProteinChains", "pdb-clusters.jls")
+const PDBMethods = CSVDataset("MurrellLab/ProteinChains", "pdb-methods.csv")
 const PDBTable = CSVDataset("MurrellLab/ProteinChains", "pdb-table.csv")
 
 using StaticArrays, StaticStrings
