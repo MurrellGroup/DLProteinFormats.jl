@@ -20,18 +20,20 @@ categorize(v::AbstractArray, d::Categorizer) = categorize.(v, (d,))
 onehotcats(v, d::Categorizer) = onehotbatch(categorize(v, d), 0:d.max) .* true
 
 
+
 ########Batch sampling########
 one_ind_per_cluster(clusters) = [rand(findall(clusters .== c)) for c in unique(clusters)]
 length2batch(length_max, fac) = L -> floor(Int, length_max^fac/L^fac)
+
 
 """
     sample_batched_inds(flatrecs; l2b = length2batch(1000, 1.9))
 
 Takes a vector of (flattened) protein structures, and returns a vector of indices into the original array, with each batch containing a random sample of one protein from each cluster.
 """
-function sample_batched_inds(flatrecs; l2b = length2batch(1000, 1.9))
-    sampled_inds = filter(ind -> l2b(flatrecs.len[ind]) > 0, one_ind_per_cluster([r.cluster for r in flatrecs]))
-    indices_lengths_jitter = [(ind, flatrecs.len[ind], flatrecs.len[ind] + 2randn()) for ind in sampled_inds]
+function sample_batched_inds(lens, clusters; l2b = length2batch(1000, 1.9))
+    sampled_inds = filter(ind -> l2b(lens[ind]) > 0, one_ind_per_cluster(clusters))
+    indices_lengths_jitter = [(ind, lens[ind], lens[ind] + 2randn()) for ind in sampled_inds]
     sort!(indices_lengths_jitter, by = x -> x[3])
     batch_inds = Vector{Int}[]
     current_batch = Int[]
@@ -52,6 +54,9 @@ function sample_batched_inds(flatrecs; l2b = length2batch(1000, 1.9))
     end
     return shuffle(batch_inds)
 end
+
+sample_batched_inds(flatrecs::MergedArrays.MergedVector; l2b = length2batch(1000, 1.9)) = sample_batched_inds(flatrecs.len, flatrecs.cluster, l2b = l2b)
+
 
 ########Handling repeats########
 export get_repeats_graph, get_residue_to_master, get_reduced_chainids, expand_mask
@@ -201,7 +206,26 @@ end
 
 
 
-#Getting from flat locs, rots, etc to ProteinStructure
+"""
+    unflatten(locs, rots, seqints, chainids, resnums)
+    unflatten(locs, rots, seqhots, chainids, resnums)  
+    unflatten(locs, rots, seq, chainids, resnums)
+
+Converts flattened protein structure data back into ProteinChain objects.
+
+# Arguments
+- `locs`: Array of translations/locations (3×1×L or 3×1×L×B for batched)
+- `rots`: Array of rotations (3×3×L or 3×3×L×B for batched) 
+- `seqints`/`seqhots`/`seq`: Sequence data as integers, one-hot encoding, or generic sequence
+- `chainids`: Chain identifiers for each residue
+- `resnums`: Residue numbers for each position
+
+# Returns
+- Vector of `ProteinChain` objects (or vector of vectors for batched input)
+
+The function reconstructs protein chains from flattened representations, applying unit scaling
+to locations and converting sequence integers back to amino acid strings.
+"""
 function unflatten(locs::AbstractArray{T,3}, rots::AbstractArray{T,3}, seqints::AbstractVector, chainids, resnums) where T
     seqstrs = ints_to_aa(seqints)
     return [ProteinChain(string(i),
@@ -218,3 +242,5 @@ end
 function unflatten(locs::AbstractArray{T,4}, rots::AbstractArray{T,4}, seq, chainids, resnums) where T
     return [unflatten(locs[:,:,:,i], rots[:,:,:,i], selectdim(seq, ndims(seq), i), chainids[:,i], resnums[:,i]) for i in 1:size(locs, 4)]
 end
+
+
