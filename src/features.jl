@@ -9,9 +9,10 @@ bin_feature_names = ["contact_order_over_sqrt_length",
                           "pairedcys_ratio",
                           "avg_temp",
                           "scTM",
-                          "interchain_residue_prop"]
+                          "interchain_residue_prop",
+                          "length"]
 
-for f in five_bin_feature_names
+for f in bin_feature_names
     print(f," = ")
     print("(col = \"$(f)\", d = ")
     print(quantile(union(skipmissing(chainfeatures[!,f])), [0.2, 0.4, 0.6, 0.8]))
@@ -34,6 +35,7 @@ const CHAIN_FEATS_V1 = (
     avg_temp = (col = "avg_temp", d = [48.8, 57.1, 69.8, 82.7]),
     scTM = (col = "scTM", d = [0.39088, 0.60834, 0.79817, 0.92681]),
     interchain_residue_prop = (col = "interchain_residue_prop", d = [0.09684589853010905, 0.18772309835961742, 0.2775269773269208, 0.4256217258921648]),
+    length = (col = "length", d = [20, 30, 40, 50, 60, 70, 80, 100, 125, 150, 200, 250, 300, 400, 500, 750, 1000]),
 )
 
 
@@ -45,12 +47,16 @@ getrow(pdb_id, chain_id, rowmap) = get(rowmap, (pdb_id, chain_id), nothing)
 swap_value(x,chain_id,featname,::Nothing) = x
 swap_value(x,chain_id,featname,override) = get(get(override, chain_id, x), featname, x)
 
+rand_cats(v, p) = v .| (rand(length(v)) .< p)
+
 """
     featurizer(table::DataFrame, features::NamedTuple; all_mask_prob = 0, feat_mask_prob = 0)
 
 Returns a function that will convert a PDB and chain to a feature vector.
 `all_mask_prob` is the probability of masking all features for a chain.
 `feat_mask_prob` is the probability of masking a feature for a chain, or a UnivariateDistribution that will be sampled for each chain, giving the probability of masking each feature for that chain.
+`rand_cats_prob` is the probability of randomly setting an extra category for a feature to positve. This allows conditioning on a range of values.
+`rand_cats_weight` is the number of chains that will have non-zero rand_cats_prob.
 
 In the returned function, `override` is a dictionary of chain_id => dictionary of feature name => value.
 
@@ -59,7 +65,7 @@ chainfeatures = DLProteinFormats.load(PDBTable)
 ff = featurizer(chainfeatures, features, all_mask_prob = 0.33, feat_mask_prob = Uniform(0,1))
 ff("7A7B", "D", override = Dict(["D" => Dict(["gene_superkingdom" => "Eukaryota"])]))
 """
-function featurizer(table::DataFrame, features::NamedTuple; all_mask_prob = 0, feat_mask_prob = 0)
+function featurizer(table::DataFrame, features::NamedTuple; all_mask_prob = 0, feat_mask_prob = 0, rand_cats_prob = 0, rand_cats_weight = 0)
     rl = rowlookup(table)
     cats = [(col = v.col, cat = DLProteinFormats.Categorizer(v.d)) for v in values(features)]
     feat_len = sum([c.cat.max + 1 for c in cats])
@@ -73,8 +79,9 @@ function featurizer(table::DataFrame, features::NamedTuple; all_mask_prob = 0, f
             feat_p = feat_mask_prob
         else
             feat_p = rand(feat_mask_prob)
-        end 
-        feat_vecs = (rand() > all_mask_prob) .* vcat([(rand() > feat_p) .* DLProteinFormats.onehotcats(swap_value(table[r, cat.col], chain_id, cat.col, override), cat.cat) for cat in cats]...)
+        end
+        rcw = rand() < rand_cats_weight ? rand_cats_prob : 0.0
+        return (rand() > all_mask_prob) .* vcat([(rand() > feat_p) .* rand_cats(onehotcats(swap_value(table[r, cat.col], chain_id, cat.col, override), cat.cat), rcw) for cat in cats]...)
     end
     return featurize
 end
