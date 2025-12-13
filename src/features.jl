@@ -45,7 +45,7 @@ rowlookup(chainfeatures) = Dict(zip((zip(chainfeatures.pdb_id, chainfeatures.cha
 getrow(pdb_id, chain_id, rowmap) = get(rowmap, (pdb_id, chain_id), nothing)
 
 swap_value(x,chain_id,featname,::Nothing) = x
-swap_value(x,chain_id,featname,override) = get(get(override, chain_id, x), featname, x)
+swap_value(x,chain_id,featname,override) = get(get(override, chain_id, Dict()), featname, x)
 
 rand_cats(v, p) = v .| (rand(length(v)) .< p)
 
