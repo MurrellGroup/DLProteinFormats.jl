@@ -39,7 +39,19 @@ const CHAIN_FEATS_V1 = (
 )
 
 
-
+CHAIN_FEATS_64 = (
+    genetax =   (col = "gene_superkingdom", d = Dict("Eukaryota" => 1, "Bacteria" => 2)),
+    contact_order_over_sqrt_length = (col = "contact_order_over_sqrt_length", d = [0.7325347827051389, 1.0703505020915856, 1.2922797590340793, 1.5753821959445977]),
+    radius_of_gyration_over_cube_root_length = (col = "radius_of_gyration_over_cube_root_length", d = [2.8571601663905595, 3.0451660334222233, 3.380207647237415, 3.996398936125884]),
+    interchain_atom_prop = (col = "interchain_atom_prop", d = [0.07700198342597483, 0.13216181619044248, 0.19808429001635658, 0.31703558148141625]),
+    helix_proportion = (col = "helix_proportion", d = [0.2172976323401412, 0.35179543193742807, 0.453972149186873, 0.5978494390234195]),
+    sheet_proportion = (col = "sheet_proportion", d = [0.11064068180463674, 0.17411438399286255, 0.24727922780444928, 0.35310196114880565]),
+    cys_prop = (col = "cys_prop", d = [0.00869702806824436, 0.01600465793304222, 0.024576411453660067, 0.038574819838914795]),
+    pairedcys_ratio = (col = "pairedcys_ratio", d = [0.12580645161290324, 0.4358695652173913, 0.7471428571428571, 0.9227752639517346]),
+    interchain_residue_prop = (col = "interchain_residue_prop", d = [0.09684589853010905, 0.18772309835961742, 0.2775269773269208, 0.4256217258921648]),
+    symmetric = (col = "has_similar", d = Dict(false => 1, true => 2)),
+    length = (col = "length", d = [30, 60, 100, 130, 190, 250, 350, 500]),
+)
 
 rowlookup(chainfeatures) = Dict(zip((zip(chainfeatures.pdb_id, chainfeatures.chain_id)), 1:length(chainfeatures.pdb_id)))
 getrow(pdb_id, chain_id, rowmap) = get(rowmap, (pdb_id, chain_id), nothing)
