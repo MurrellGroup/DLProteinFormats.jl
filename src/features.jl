@@ -105,7 +105,7 @@ chain_label_clean(s) = split(s, "-")[1]
     broadcast_features(pdbids, chain_labels, batched_chainids, feature_func)
 
 Broadcasts feature vectors for a set of PDBs and chain labels over a batched set of chain ids.
-`pdbids` is a vector of PDB ids.
+`pdbids` is a vector of PDB ids, or a vector of vectors of PDB IDs
 `chain_labels` is a vector of chain labels.
 `batched_chainids` is a matrix of chain ids.
 `feature_func` is a function that will convert a PDB and chain to a feature vector.
@@ -121,18 +121,33 @@ chainids[1:dat[29].len,2] .= dat[29].chainids
 
 bf = broadcast_features(pdbids, chain_labels, chainids, ff)
 """
-function broadcast_features(pdbids, chain_labels, batched_chainids, feature_func)
-    pdbids = pdbid_clean.(pdbids)
-    chain_labels = [chain_label_clean.(cl) for cl in chain_labels]
-    template_vec = feature_func("?", "?") .* 0
-    feats = falses(length(template_vec), size(batched_chainids)...)
-    for i in 1:length(pdbids)
-        for j in 1:length(chain_labels[i])
-            fv = feature_func(pdbids[i], chain_labels[i][j])
-            feats[:,batched_chainids[:,i] .== j, i] .= fv
+#Should be used during training, when all chains have the same PDB ID:
+function broadcast_features(pdbids::AbstractVector{<:AbstractString}, chain_labels, batched_chainids, feature_func)
+        pdbids = pdbid_clean.(pdbids)
+        chain_labels = [chain_label_clean.(cl) for cl in chain_labels]
+        template_vec = feature_func("?", "?") .* 0
+        feats = falses(length(template_vec), size(batched_chainids)...)
+        for i in 1:length(pdbids)
+                for j in 1:length(chain_labels[i])
+                fv = feature_func(pdbids[i], chain_labels[i][j])
+                feats[:,batched_chainids[:,i] .== j, i] .= fv
+                end
         end
-    end
-    return feats
+        return feats
+end
+#Useful during design, when you might want to pull in chain properties from a different PDB:
+function broadcast_features(pdbids::AbstractVector{<:AbstractVector{<:AbstractString}}, chain_labels, batched_chainids, feature_func)
+        pdbids = [pdbid_clean.(p) for p in pdbids]
+        chain_labels = [chain_label_clean.(cl) for cl in chain_labels]
+        template_vec = feature_func("?", "?") .* 0
+        feats = falses(length(template_vec), size(batched_chainids)...)
+        for i in 1:length(pdbids)
+                for j in 1:length(chain_labels[i])
+                        fv = feature_func(pdbids[i][j], chain_labels[i][j])
+                        feats[:,batched_chainids[:,i] .== j, i] .= fv
+                end
+        end
+        return feats
 end
 
 export featurizer, broadcast_features
