@@ -1,6 +1,6 @@
 name = "DLProteinFormats"
 uuid = "df93d313-1126-4eb6-ac29-b325d5898587"
-version = "0.1.15"
+version = "0.1.16"
 authors = ["murrellb <murrellb@gmail.com> and contributors"]
 
 [deps]
