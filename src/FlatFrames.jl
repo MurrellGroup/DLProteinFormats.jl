@@ -2,7 +2,7 @@ const unit_scaling = 10
 const AAs = collect("ACDEFGHIKLMNPQRSTVWY")
 const AA2ind = Dict(zip(AAs,1:length(AAs)))
 aa_to_int(aa::Char) = get(AA2ind, aa, 21)
-int_to_aa(i::Int) = i == 21 ? 'X' : AAs[i]
+int_to_aa(i::Integer) = i == 21 ? 'X' : AAs[i]
 aa_to_ints(aa::AbstractString) = [aa_to_int(a) for a in aa]
 ints_to_aa(ints::AbstractVector) = join(int_to_aa.(ints))
 

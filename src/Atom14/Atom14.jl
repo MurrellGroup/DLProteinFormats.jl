@@ -145,7 +145,7 @@ function flatten(::Atom14, structure::ProteinStructure; T=Float32)
     end
     @assert pos-1 == len == length(AAs)
     return (; record_type = :Atom14, structure.name, chain_labels, len,
-        locs = (locs .- mean(locs, dims = 2)), rots, AAs,
+        locs = (locs .- mean(locs, dims = 2)) ./ unit_scaling, rots, AAs,
         resinds, chainids, atom14_coords, complete_side_chain)
 end
 
@@ -155,7 +155,7 @@ function unflatten(::Atom14, seqints, chainids, resnums, atom14_coords)
     chains = map(unique(chainids)) do i
         chain_range = findall(chainids .== i)
         seq = sequence[chain_range]
-        chain = ProteinChain(string(i), atom14_to_atoms(view(atom14_coords,:,:,chain_range), seq), seq, resnums[chain_range])
+        chain = ProteinChain(string(i), atom14_to_atoms(view(atom14_coords,:,:,chain_range) .* unit_scaling, seq), seq, Int.(resnums[chain_range]))
         chain.atom14_coords = atom14_coords[:,:,chain_range]
         return chain
     end
