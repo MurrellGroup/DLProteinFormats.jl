@@ -13,6 +13,9 @@ include("shared.jl")
 
 include("features.jl")
 
+include("Atom14/Atom14.jl")
+export Atom14
+
 
 import ProteinChains: writepdb, writecif, pdbentry, @pdb_str
 export writepdb, writecif, pdbentry, @pdb_str
