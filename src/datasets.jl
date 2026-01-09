@@ -62,8 +62,8 @@ const PDBSimpleFlat500 = SerializedDataset("MurrellLab/ProteinChains", "pdb-simp
 const PDBSimpleFlatV2 = JLD2Dataset("MurrellLab/ProteinChains", "flat-v2.jld2")
 const PDBSimpleFlatV2_500 = JLD2Dataset("MurrellLab/ProteinChains", "flat-v2-500.jld2")
 
-const PDBAtom14 = SerializedDataset("MurrellLab/ProteinChains", "pdb-atom14.jls")
-const PDBAtom14_500 = SerializedDataset("MurrellLab/ProteinChains", "pdb-atom14-500.jls")
+const PDBAtom14 = JLD2Dataset("MurrellLab/ProteinChains", "pdb-atom14.jld2")
+const PDBAtom14_500 = JLD2Dataset("MurrellLab/ProteinChains", "pdb-atom14-500.jld2")
 
 const PDBClusters = SerializedDataset("MurrellLab/ProteinChains", "pdb-clusters.jls")
 const PDBMethods = CSVDataset("MurrellLab/ProteinChains", "pdb-methods.csv")
