@@ -121,7 +121,7 @@ end
 function flatten(::Atom14, structure::ProteinStructure; T=Float32)
     len = sum(length, structure)
     chainids = reduce(vcat, [fill(i, l) for (i, l) in enumerate(length.(structure))], init=Int[])
-    locs = zeros(T, 3, len)
+    locs = zeros(T, 3, 1, len)
     rots = zeros(T, 3, 3, len)
     resinds = zeros(Int, len)
     AAs = zeros(Int, len)
@@ -135,7 +135,7 @@ function flatten(::Atom14, structure::ProteinStructure; T=Float32)
         chain_len = length(chain)
         chain_range = pos:pos+chain_len-1
         f = ProteinChains.Frames(chain)
-        locs[:, chain_range] .= f.translations
+        locs[:, 1, chain_range] .= f.translations
         rots[:, :, chain_range] .= f.rotations
         resinds[chain_range] .= chain.numbering
         AAs[chain_range] .= DLProteinFormats.aa_to_ints(chain.sequence)
@@ -145,7 +145,7 @@ function flatten(::Atom14, structure::ProteinStructure; T=Float32)
     end
     @assert pos-1 == len == length(AAs)
     return (; record_type = :Atom14, structure.name, chain_labels, len,
-        locs = (locs .- mean(locs, dims = 2)) ./ unit_scaling, rots, AAs,
+        locs = (locs .- mean(locs, dims = 3)) ./ unit_scaling, rots, AAs,
         resinds, chainids, atom14_coords, complete_side_chain)
 end
 
