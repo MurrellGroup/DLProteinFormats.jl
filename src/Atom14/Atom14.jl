@@ -162,3 +162,48 @@ function unflatten(::Atom14, seqints, chainids, resnums, atom14_coords)
 
     return ProteinStructure("structure", chains)
 end
+
+function atom14_to_aacodes(atom14_coords::AbstractArray{<:Real,3}; radius::Real=0.02) #Tolerance assuming nm
+    r2 = radius^2
+    L = size(atom14_coords, 3)
+    seq = Vector{Char}(undef, L)
+
+    @inbounds for i in 1:L
+        n1, n2, n3 = atom14_coords[1,1,i], atom14_coords[2,1,i], atom14_coords[3,1,i]
+        a1, a2, a3 = atom14_coords[1,2,i], atom14_coords[2,2,i], atom14_coords[3,2,i] # CA
+        c1, c2, c3 = atom14_coords[1,3,i], atom14_coords[2,3,i], atom14_coords[3,3,i] # C
+        o1, o2, o3 = atom14_coords[1,4,i], atom14_coords[2,4,i], atom14_coords[3,4,i] # O
+
+        counts = Int[0, 0, 0, 0]  # N, CA, C, O (virtual placements among atoms 5:14)
+
+        for j in 5:14
+            x, y, z = atom14_coords[1,j,i], atom14_coords[2,j,i], atom14_coords[3,j,i]
+
+            d2n  = (x-n1)^2 + (y-n2)^2 + (z-n3)^2
+            d2ca = (x-a1)^2 + (y-a2)^2 + (z-a3)^2
+            d2c  = (x-c1)^2 + (y-c2)^2 + (z-c3)^2
+            d2o  = (x-o1)^2 + (y-o2)^2 + (z-o3)^2
+
+            bestk, bestd2 = 1, d2n
+            if d2ca < bestd2; bestk, bestd2 = 2, d2ca; end
+            if d2c  < bestd2; bestk, bestd2 = 3, d2c;  end
+            if d2o  < bestd2; bestk, bestd2 = 4, d2o;  end
+
+            if bestd2 <= r2
+                counts[bestk] += 1
+            end
+        end
+
+        token = get(placement_count_to_token, (counts[1], counts[2], counts[3], counts[4]), "UNK")
+        if token == "UNK" || token == "PAD" || token == "-"
+            seq[i] = 'X'
+        else
+            ol = oneletter_resname(token)
+            seq[i] = ol isa Char ? ol : ol[1]
+        end
+    end
+
+    return String(seq)
+end
+
+int_seq_from_at14(at14) = aa_to_ints(atom14_to_aacodes(at14))
