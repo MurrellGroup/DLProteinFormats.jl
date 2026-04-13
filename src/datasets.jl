@@ -54,6 +54,7 @@ export PDBClusters, PDBMethods, PDBTable
 export PDBFlatom169K
 export SwissProtSplitStore, SwissProtSplitStore500, SwissProtSplitSimpleFlat, SwissProtSplitSimpleFlat500
 export QM9Crude1000
+export QM9Simple, QM9Simple1000
 
 const PDBStore = PSSDataset("MurrellLab/ProteinChains", "pdb.pss")
 const PDBStore500 = PSSDataset("MurrellLab/ProteinChains", "pdb-500.pss")
@@ -78,6 +79,8 @@ const SwissProtSplitSimpleFlat = SerializedDataset("MurrellLab/ProteinChains", "
 const SwissProtSplitSimpleFlat500 = SerializedDataset("MurrellLab/ProteinChains", "swissprot-split-simple-flat-500.jls")
 
 const QM9Crude1000 = SerializedDataset("MurrellLab/ProteinChains", "qm9-crude-1000.jls")
+const QM9Simple = JLD2Dataset("MurrellLab/ProteinChains", "qm9.jld2")
+const QM9Simple1000 = JLD2Dataset("MurrellLab/ProteinChains", "qm9-1000.jld2")
 
 remove_cache(dataset::AbstractProteinDataset) = HuggingFaceApi.remove_cache(dataset.hfurl; now=true)
 remove_cache() = HuggingFaceApi.remove_cache("MurrellLab/ProteinChains")
